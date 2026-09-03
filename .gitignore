@@ -1,0 +1,61 @@
+# ==========================================
+# ThreatLens .gitignore
+# ==========================================
+
+# 1. API Keys & Environment Secrets (NEVER PUSH TO GITHUB)
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+*.pem
+*.key
+*.crt
+
+# 2. Virtual Environments & Python Artifacts
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+.coverage
+htmlcov/
+
+# 3. Node & Frontend Build Artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 4. Local SQLite Databases & Data Caches
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+threatlens.db
+
+# 5. Exported Reports & Temporary Scratch Files
+*.log
+*.pdf
+scratch/
+tmp/
+temp/
+
+# 6. Operating System & Editor Metadata
+.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.idea/
+.vscode/
+*.swp
+*.swo

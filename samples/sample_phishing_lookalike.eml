@@ -1,0 +1,28 @@
+Received: from relay.internal.net [91.240.118.89]
+	by mail.company.com (Postfix) with ESMTPS id A8912B;
+Received: from postfix.spoofhost.org (postfix.spoofhost.org [194.135.25.10])
+	by relay.internal.net with ESMTP id 55T11;
+Authentication-Results: mail.company.com;
+	spf=softfail smtp.mailfrom=payroll@microsof1-online.net;
+	dkim=fail;
+	dmarc=fail
+From: "Microsoft Payroll Office" <payroll@microsof1-online.net>
+To: <accounting@company.com>
+Reply-To: <exfil-data@bulletproof.cc>
+Subject: Action Required: Mandatory Year-End Direct Deposit Verification
+Date: Wed, 02 Sep 2026 15:10:00 +0000
+Content-Type: text/plain; charset=utf-8
+
+All Corporate Employees,
+
+During our mandatory annual tax compliance audit, errors were flagged in your direct deposit bank routing records.
+To avoid salary deposit disruption on this Friday's payroll run, update your bank account information immediately.
+
+Access the Corporate HR Portal:
+http://microsof1-online.net/payroll-portal
+
+All submissions must be confirmed prior to 5:00 PM today.
+
+Human Resources and Benefits Administration
+Microsoft Corporation
+
