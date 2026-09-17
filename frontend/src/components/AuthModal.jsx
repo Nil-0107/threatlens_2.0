@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Mail, Lock, User, UserCheck, X, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ShieldCheck, Mail, Lock, User, X, Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { loginUser, signupUser } from '../api/client';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
-  if (!isOpen) return null;
-
   const [mode, setMode] = useState('login'); // 'login' | 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,6 +10,17 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
   const [role, setRole] = useState('analyst');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,26 +68,28 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" role="presentation">
+      <div className="tl-panel relative w-full max-w-md p-6 text-[var(--tl-text)]" role="dialog" aria-modal="true" aria-labelledby="auth-modal-heading">
         {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          aria-label="Close authentication dialog"
+          className="absolute right-4 top-4 rounded-md p-1.5 text-[var(--tl-text-muted)] transition-colors hover:bg-[var(--tl-surface-hover)] hover:text-[var(--tl-text)]"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
         <div className="flex items-center space-x-3 mb-5">
-          <div className="bg-gradient-to-tr from-blue-600 to-indigo-500 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
-            <ShieldCheck className="w-6 h-6 text-white" />
+          <div className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-2.5 text-[var(--tl-accent)]">
+            <ShieldCheck className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">
+            <h3 id="auth-modal-heading" className="text-lg font-semibold text-[var(--tl-text)]">
               {mode === 'login' ? 'Analyst Authentication' : 'Create Investigator Account'}
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[var(--tl-text-secondary)]">
               {mode === 'login'
                 ? 'Sign in to access forensic audits & evidence records.'
                 : 'Register your identity in the Evidence Vault ledger.'}
@@ -87,8 +98,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         </div>
 
         {/* Quick Demo Logins Banner */}
-        <div className="mb-4 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-xs">
-          <div className="flex items-center gap-1.5 text-slate-400 font-semibold mb-1.5">
+        <div className="tl-panel-inset mb-4 p-2.5 text-xs">
+          <div className="mb-1.5 flex items-center gap-1.5 font-semibold text-[var(--tl-text-secondary)]">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>QUICK DEMO CREDENTIALS:</span>
           </div>
@@ -96,24 +107,24 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
             <button
               type="button"
               onClick={() => fillDemoCreds('analyst')}
-              className="px-2 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-mono text-left transition-colors"
+              className="rounded-md border border-[var(--tl-border)] bg-[var(--tl-surface-inset)] px-2 py-1.5 text-left font-mono text-[11px] transition-colors hover:bg-[var(--tl-surface-hover)]"
             >
-              <div className="font-bold text-blue-400">Priya Sharma</div>
-              <div className="text-slate-400">analyst@threatlens.io</div>
+              <div className="font-bold text-[var(--tl-info)]">Priya Sharma</div>
+              <div className="text-[var(--tl-text-muted)]">analyst@threatlens.io</div>
             </button>
             <button
               type="button"
               onClick={() => fillDemoCreds('admin')}
-              className="px-2 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-[11px] font-mono text-left transition-colors"
+              className="rounded-md border border-[var(--tl-border)] bg-[var(--tl-surface-inset)] px-2 py-1.5 text-left font-mono text-[11px] transition-colors hover:bg-[var(--tl-surface-hover)]"
             >
-              <div className="font-bold text-emerald-400">Dr. Rajesh Kumar</div>
-              <div className="text-slate-400">admin@threatlens.io</div>
+              <div className="font-bold text-[var(--tl-accent)]">Dr. Rajesh Kumar</div>
+              <div className="text-[var(--tl-text-muted)]">admin@threatlens.io</div>
             </button>
           </div>
         </div>
 
         {/* Mode Switcher Tabs */}
-        <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs mb-4">
+        <div className="mb-4 flex rounded-lg border border-[var(--tl-border)] bg-[var(--tl-surface-inset)] p-1 text-xs">
           <button
             type="button"
             onClick={() => {
@@ -121,7 +132,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
               setError('');
             }}
             className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-              mode === 'login' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              mode === 'login' ? 'bg-[var(--tl-accent)] text-[#06150e]' : 'text-[var(--tl-text-muted)] hover:text-[var(--tl-text)]'
             }`}
           >
             Sign In
@@ -133,7 +144,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
               setError('');
             }}
             className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-              mode === 'signup' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              mode === 'signup' ? 'bg-[var(--tl-accent)] text-[#06150e]' : 'text-[var(--tl-text-muted)] hover:text-[var(--tl-text)]'
             }`}
           >
             Create Account
@@ -144,62 +155,62 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {mode === 'signup' && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="mb-1 block text-xs font-semibold text-[var(--tl-text-secondary)]">
                 Full Name / Investigator Title
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                <User className="absolute left-3 top-3 h-4 w-4 text-[var(--tl-text-muted)]" />
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g., Inspector Ananya Roy"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
+                  className="tl-input w-full pl-9 pr-3 py-2.5 text-xs"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+            <label className="mb-1 block text-xs font-semibold text-[var(--tl-text-secondary)]">Email Address</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-[var(--tl-text-muted)]" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="analyst@threatlens.io"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                className="tl-input w-full pl-9 pr-3 py-2.5 text-xs font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+            <label className="mb-1 block text-xs font-semibold text-[var(--tl-text-secondary)]">Password</label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-[var(--tl-text-muted)]" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                className="tl-input w-full pl-9 pr-3 py-2.5 text-xs font-mono"
               />
             </div>
           </div>
 
           {mode === 'signup' && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="mb-1 block text-xs font-semibold text-[var(--tl-text-secondary)]">
                 Assigned Operational Role
               </label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                className="tl-input w-full px-3 py-2.5 text-xs"
               >
                 <option value="analyst">Cyber Cell Analyst (Scan & Tracing)</option>
                 <option value="admin">Enterprise Lead / CERT-In Admin (Full Governance)</option>
@@ -208,7 +219,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           )}
 
           {error && (
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
+            <div className="flex items-center gap-2 rounded-lg border border-red-400/35 bg-red-400/10 p-3 text-xs text-red-300" role="alert" aria-live="assertive">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -217,7 +228,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+            className="tl-button-primary mt-2 flex w-full items-center justify-center gap-2"
           >
             {loading ? (
               <>

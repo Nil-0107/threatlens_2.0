@@ -152,7 +152,7 @@ export default function EmailUploader({ onScanComplete }) {
       setTimeout(() => setScanStep('2/5 Evaluating SPF/DKIM & lookalike brand domains...'), 200);
       setTimeout(() => setScanStep('3/5 Running leak-free Scikit-Learn body classifier...'), 450);
       setTimeout(() => setScanStep('4/5 Tracing chronological Received: hop trail...'), 700);
-      setTimeout(() => setScanStep('5/5 Appending to tamper-evident Evidence Vault...'), 950);
+      setTimeout(() => setScanStep('5/5 Appending to the Evidence Vault demonstration record...'), 950);
 
       let payload;
       if (activeMode === 'upload' && selectedFile) {
@@ -173,33 +173,55 @@ export default function EmailUploader({ onScanComplete }) {
     }
   };
 
+  const hasInput = activeMode === 'upload' ? Boolean(selectedFile) : Boolean(rawText.trim());
+  const activeStep = loading ? Number.parseInt(scanStep.split('/')[0], 10) || 1 : 0;
+  const progressSteps = [
+    'Parse email',
+    'Evaluate headers',
+    'Classify content',
+    'Trace hop trail',
+    'Preserve record',
+  ];
+
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-        <div>
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <UploadCloud className="w-5 h-5 text-blue-400" />
+    <div className="tl-intake-console p-5 sm:p-6" aria-busy={loading}>
+      <div className="flex flex-col justify-between gap-4 border-b border-[var(--tl-border)] pb-5 md:flex-row md:items-center">
+        <div className="min-w-0">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="tl-eyebrow">Primary analysis action</span>
+            <span className="rounded-full border border-[var(--tl-border)] px-2 py-0.5 font-mono text-[10px] text-[var(--tl-text-muted)]">RFC 822 / MIME</span>
+          </div>
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-[var(--tl-text)]">
+            <UploadCloud className="h-5 w-5 text-[var(--tl-accent)]" />
             Scan & Analyze Incoming Email
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Ingest .eml files or raw RFC 822 payloads for multi-layer threat detection, geolocation tracing, and forensic preservation.
+          <p className="mt-1 w-full max-w-2xl break-words text-xs leading-5 text-[var(--tl-text-secondary)]">
+            Choose one existing email source. ThreatLens will analyze its headers and body, then show the investigation below.
           </p>
         </div>
 
         {/* Input Mode Toggle */}
-        <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs self-start md:self-auto">
+        <div className="flex items-center self-start rounded-lg border border-[var(--tl-border)] bg-[var(--tl-surface-inset)] p-1 text-xs md:self-auto" aria-label="Email source">
           <button
-            onClick={() => setActiveMode('upload')}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
-              activeMode === 'upload' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
+            type="button"
+            onClick={() => {
+              setError('');
+              setActiveMode('upload');
+            }}
+            className={`rounded-md px-3 py-1.5 font-semibold transition-colors ${
+              activeMode === 'upload' ? 'bg-[var(--tl-accent)] text-[#06150e]' : 'text-[var(--tl-text-muted)] hover:text-[var(--tl-text)]'
             }`}
           >
             File Upload (.eml)
           </button>
           <button
-            onClick={() => setActiveMode('paste')}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
-              activeMode === 'paste' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
+            type="button"
+            onClick={() => {
+              setError('');
+              setActiveMode('paste');
+            }}
+            className={`rounded-md px-3 py-1.5 font-semibold transition-colors ${
+              activeMode === 'paste' ? 'bg-[var(--tl-accent)] text-[#06150e]' : 'text-[var(--tl-text-muted)] hover:text-[var(--tl-text)]'
             }`}
           >
             Raw Text / Paste
@@ -208,26 +230,54 @@ export default function EmailUploader({ onScanComplete }) {
       </div>
 
       {/* Quick Demo Preloads */}
-      <div className="mt-4 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
-        <div className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold mb-2">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>HACKATHON QUICK SAMPLES:</span>
+      <div className="tl-intake-strip mt-4 p-3">
+        <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-[var(--tl-text-secondary)]">
+          <Sparkles className="h-3.5 w-3.5 text-[var(--tl-caution)]" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.1em]">Hackathon quick samples</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {Object.entries(SAMPLES).map(([key, item]) => (
             <button
               key={key}
+              type="button"
               onClick={() => handleSampleSelect(key)}
-              className="text-left p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-blue-500/40 transition-all group"
+              className="group rounded-md border border-[var(--tl-border)] border-l-2 border-l-[var(--tl-border-strong)] bg-[var(--tl-surface)] p-2.5 text-left transition-colors hover:border-l-[var(--tl-accent)] hover:bg-[var(--tl-surface-hover)]"
             >
-              <div className="text-xs font-medium text-slate-200 group-hover:text-blue-400 transition-colors">
+              <div className="text-xs font-medium text-[var(--tl-text)] transition-colors group-hover:text-[var(--tl-accent)]">
                 {item.name}
               </div>
-              <div className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+              <div className="mt-0.5 line-clamp-1 text-[11px] text-[var(--tl-text-muted)]">
                 {item.desc}
               </div>
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
+        <div className="tl-intake-meta flex items-start gap-3 p-3">
+          <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[var(--tl-accent)]" />
+          <div>
+            <p className="tl-kpi-label">What am I analyzing?</p>
+            <p className="mt-1 text-xs font-medium text-[var(--tl-text)]">
+              {activeMode === 'upload'
+                ? selectedFile
+                  ? selectedFile.name
+                  : 'No .eml file selected yet'
+                : rawText.trim()
+                ? 'Pasted RFC 822 email content'
+                : 'No raw email content pasted yet'}
+            </p>
+          </div>
+        </div>
+        <div className="tl-intake-meta flex items-start gap-3 p-3">
+          <div className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${loading ? 'animate-pulse bg-[var(--tl-caution)]' : hasInput ? 'bg-[var(--tl-accent)]' : 'bg-[var(--tl-text-muted)]'}`} />
+          <div>
+            <p className="tl-kpi-label">What happens next?</p>
+            <p className="mt-1 text-xs text-[var(--tl-text-secondary)]">
+              {loading ? 'The existing analysis pipeline is running.' : hasInput ? 'Start the scan to open the investigation.' : 'Choose a file or paste content to continue.'}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -238,86 +288,126 @@ export default function EmailUploader({ onScanComplete }) {
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click();
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={selectedFile ? `Selected file ${selectedFile.name}. Activate to choose a different file.` : 'Choose an email file or drop one here.'}
+            className={`tl-intake-dropzone cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors ${
               selectedFile
-                ? 'border-blue-500 bg-blue-500/5'
-                : 'border-slate-700 hover:border-slate-500 bg-slate-950/30'
+                ? 'border-emerald-400/70 bg-emerald-400/5'
+                : 'border-[var(--tl-border-strong)] bg-[var(--tl-surface-inset)] hover:border-emerald-400/50'
             }`}
           >
             <input
               type="file"
+              id="threatlens-email-file"
               ref={fileInputRef}
               onChange={handleFileChange}
               accept=".eml,message/rfc822,text/plain"
+              aria-label="Email file"
               className="hidden"
             />
             <div className="flex flex-col items-center">
-              <div className="p-3 bg-slate-800/70 rounded-full mb-3 text-blue-400">
-                <FileText className="w-8 h-8" />
+              <div className="mb-3 rounded-full border border-emerald-400/25 bg-emerald-400/10 p-3 text-[var(--tl-accent)]">
+                <FileText className="h-8 w-8" />
               </div>
               {selectedFile ? (
                 <div>
-                  <p className="text-sm font-semibold text-white">{selectedFile.name}</p>
-                  <p className="text-xs text-slate-400 mt-1 font-mono">
+                  <p className="text-sm font-semibold text-[var(--tl-text)]">{selectedFile.name}</p>
+                  <p className="mt-1 font-mono text-xs text-[var(--tl-text-secondary)]">
                     {(selectedFile.size / 1024).toFixed(1)} KB — Click to change file
                   </p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm font-medium text-slate-300">
-                    Drop suspicious <span className="text-blue-400 font-semibold">.eml file</span> here or click to browse
+                  <p className="text-sm font-medium text-[var(--tl-text-secondary)]">
+                    Drop suspicious <span className="font-semibold text-[var(--tl-accent)]">.eml file</span> here or click to browse
                   </p>
-                  <p className="text-xs text-slate-500 mt-1">Supports RFC 822, MIME multipart emails</p>
+                  <p className="mt-1 text-xs text-[var(--tl-text-muted)]">Supports RFC 822, MIME multipart emails</p>
                 </div>
               )}
             </div>
           </div>
         ) : (
           <div>
+            <label htmlFor="threatlens-email-text" className="mb-2 block text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--tl-text-muted)]">
+              Raw RFC 822 email content
+            </label>
             <textarea
+              id="threatlens-email-text"
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}
+              aria-label="Raw RFC 822 email content"
               placeholder="Paste raw email RFC 822 text (including Received: headers, From:, Subject:, and Body)..."
               rows={8}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
+              className="tl-input w-full p-3 text-xs font-mono transition-colors"
             />
           </div>
         )}
       </div>
 
+      {loading && (
+        <div className="mt-4 rounded-lg border border-amber-400/25 bg-amber-400/5 p-3" role="status" aria-live="polite">
+          <div className="flex items-center justify-between gap-3">
+            <p className="tl-kpi-label text-[var(--tl-caution)]">What is happening?</p>
+            <span className="font-mono text-[11px] text-[var(--tl-text-muted)]">Step {activeStep} of 5</span>
+          </div>
+          <ol className="mt-3 grid grid-cols-5 gap-1.5" aria-label="Email analysis progress">
+            {progressSteps.map((step, index) => {
+              const stepNumber = index + 1;
+              const isActive = activeStep === stepNumber;
+              const isComplete = activeStep > stepNumber;
+              return (
+                <li key={step} className="min-w-0">
+                  <div className={`h-1 rounded-full ${isComplete ? 'bg-[var(--tl-accent)]' : isActive ? 'bg-[var(--tl-caution)]' : 'bg-[var(--tl-border)]'}`} />
+                  <span className={`mt-1 block truncate text-[10px] ${isActive ? 'font-semibold text-[var(--tl-text)]' : isComplete ? 'text-[var(--tl-text-secondary)]' : 'text-[var(--tl-text-muted)]'}`}>{step}</span>
+                </li>
+              );
+            })}
+          </ol>
+          <p className="mt-3 font-mono text-xs text-[var(--tl-text-secondary)]">{scanStep}</p>
+          <p className="mt-1 text-[11px] text-[var(--tl-text-muted)]">Keep this window open. The completed investigation will appear below.</p>
+        </div>
+      )}
+
       {error && (
-        <div className="mt-3 flex items-center gap-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="mt-3 flex items-start gap-2 rounded-lg border border-red-400/35 bg-red-400/10 p-3 text-xs text-red-300" role="alert" aria-live="assertive">
+          <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Action Button */}
-      <div className="mt-4 flex items-center justify-between">
-        <div className="text-xs text-slate-500">
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-xs text-[var(--tl-text-muted)]" aria-live="polite">
           {loading ? (
-            <span className="flex items-center gap-2 text-blue-400 font-mono">
-              <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="flex items-center gap-2 font-mono text-[var(--tl-accent)]">
+              <Loader2 className="h-4 w-4 animate-spin" />
               {scanStep}
             </span>
+          ) : hasInput ? (
+            <span className="text-[var(--tl-text-secondary)]">Ready to analyze this email.</span>
           ) : (
-            <span>Ready to analyze RFC 822 headers & payload.</span>
+            <span>{activeMode === 'upload' ? 'Select a .eml file to begin.' : 'Paste raw RFC 822 content to begin.'}</span>
           )}
         </div>
 
         <button
           onClick={handleScan}
           disabled={loading}
-          className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold shadow-lg shadow-blue-600/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label={loading ? 'Email analysis in progress' : 'Start email analysis'}
+          className="tl-button-primary inline-flex items-center justify-center gap-2 self-start px-5 sm:self-auto"
         >
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
               <span>Scanning...</span>
             </>
           ) : (
             <>
-              <Send className="w-4 h-4" />
+              <Send className="h-4 w-4" />
               <span>Scan Email</span>
             </>
           )}

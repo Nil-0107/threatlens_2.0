@@ -5,75 +5,76 @@ export default function ReasonList({ reasons = [] }) {
   const getCategoryIcon = (category) => {
     switch (category) {
       case 'HEADER_AUTH':
-        return <ShieldAlert className="w-4 h-4 text-rose-400" />;
+        return <ShieldAlert className="h-4 w-4 text-red-300" />;
       case 'DOMAIN_SPOOF':
-        return <Globe className="w-4 h-4 text-orange-400" />;
+        return <Globe className="h-4 w-4 text-orange-300" />;
       case 'URL_THREAT':
-        return <Link2 className="w-4 h-4 text-red-400" />;
+        return <Link2 className="h-4 w-4 text-red-300" />;
       case 'ML_CONTENT':
-        return <Bot className="w-4 h-4 text-purple-400" />;
+        return <Bot className="h-4 w-4 text-[var(--tl-text-secondary)]" />;
       default:
-        return <CheckCircle className="w-4 h-4 text-emerald-400" />;
+        return <CheckCircle className="h-4 w-4 text-emerald-300" />;
     }
   };
 
   const getCategoryBadge = (category) => {
     switch (category) {
       case 'HEADER_AUTH':
-        return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+        return 'bg-red-400/10 text-red-300 border-red-400/25';
       case 'DOMAIN_SPOOF':
-        return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+        return 'bg-orange-400/10 text-orange-300 border-orange-400/25';
       case 'URL_THREAT':
-        return 'bg-red-500/10 text-red-400 border-red-500/20';
+        return 'bg-red-400/10 text-red-300 border-red-400/25';
       case 'ML_CONTENT':
-        return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+        return 'border-[var(--tl-border-strong)] bg-[var(--tl-surface-hover)] text-[var(--tl-text-secondary)]';
       default:
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        return 'bg-emerald-400/10 text-emerald-300 border-emerald-400/25';
     }
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-blue-400" />
-          Threat Indicators & Explainable Risk Reasons
+    <div className="tl-evidence-list min-w-0 p-5 sm:p-6" aria-label="Existing risk findings">
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--tl-border)] pb-3">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--tl-text)]">
+          <AlertCircle className="h-4 w-4 text-[var(--tl-accent)]" />
+          Signal breakdown
         </h3>
-        <span className="text-xs text-slate-500 font-mono">
+        <span className="shrink-0 font-mono text-xs text-[var(--tl-text-muted)]">
           {reasons.length} {reasons.length === 1 ? 'finding' : 'findings'}
         </span>
       </div>
 
-      <div className="mt-4 space-y-2.5">
+      <div className="mt-4 space-y-2.5" role="list" aria-label="Risk findings">
         {reasons.length === 0 ? (
-          <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 text-center text-slate-500 text-xs">
+          <div className="tl-panel-inset p-4 text-center text-xs text-[var(--tl-text-muted)]">
             No active threat indicators detected.
           </div>
         ) : (
           reasons.map((r, i) => (
             <div
               key={r.id || i}
-              className="flex items-start justify-between gap-3 p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-colors"
+              role="listitem"
+              className="flex items-start justify-between gap-3 rounded-lg border border-[var(--tl-border)] bg-[var(--tl-surface-inset)] p-3 transition-colors hover:border-[var(--tl-border-strong)]"
             >
-              <div className="flex items-start space-x-3">
-                <div className="mt-0.5 p-1.5 rounded-lg bg-slate-900 border border-slate-800">
+              <div className="flex min-w-0 items-start space-x-3">
+                <div className="mt-0.5 shrink-0 rounded-md border border-[var(--tl-border)] bg-[var(--tl-surface)] p-1.5">
                   {getCategoryIcon(r.category)}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span
-                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${getCategoryBadge(
+                      className={`rounded border px-2 py-0.5 text-[10px] font-mono font-bold ${getCategoryBadge(
                         r.category
                       )}`}
                     >
                       {r.category}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-200 leading-relaxed">{r.reason}</p>
+                  <p className="text-xs leading-relaxed text-[var(--tl-text-secondary)] break-words">{r.reason}</p>
                 </div>
               </div>
 
-              <div className="shrink-0 font-mono text-xs font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+              <div className="shrink-0 rounded border border-red-400/25 bg-red-400/10 px-2 py-0.5 font-mono text-xs font-bold text-red-300">
                 +{r.weight}
               </div>
             </div>
@@ -83,4 +84,3 @@ export default function ReasonList({ reasons = [] }) {
     </div>
   );
 }
-

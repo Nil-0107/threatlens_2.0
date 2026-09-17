@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { MapPin, Navigation, Server, Globe2, ShieldAlert } from 'lucide-react';
+import { Server, Globe2, ShieldAlert } from 'lucide-react';
 
 export default function HopMap({ hops = [] }) {
   const mapContainerRef = useRef(null);
@@ -27,7 +27,7 @@ export default function HopMap({ hops = [] }) {
       });
 
       // Dark modern CARTO Basemaps tile layer with provided API key
-      const cartoKey = import.meta.env.VITE_CARTO_API_KEY || '';
+      const cartoKey = import.meta.env.VITE_CARTO_API_KEY || 'cb1_2v9z_1_a3b3ca71572e6462669d5f2d';
       const tileUrl = cartoKey
         ? `https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png?key=${cartoKey}`
         : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
@@ -76,7 +76,7 @@ export default function HopMap({ hops = [] }) {
       L.divIcon({
         className: 'custom-relay-pin',
         html: `
-          <div style="width: 22px; height: 22px; border-radius: 50%; background: #3b82f6; border: 2px solid #ffffff; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: bold; box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);">
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: #31d18a; border: 2px solid #06110d; display: flex; align-items: center; justify-content: center; color: #06150e; font-size: 10px; font-weight: bold; box-shadow: 0 0 8px rgba(49, 209, 138, 0.35);">
             ${order + 1}
           </div>
         `,
@@ -114,7 +114,7 @@ export default function HopMap({ hops = [] }) {
     // Draw route polyline
     if (latLngs.length > 1) {
       polylineRef.current = L.polyline(latLngs, {
-        color: '#38bdf8',
+        color: '#31d18a',
         weight: 3,
         opacity: 0.85,
         dashArray: '6, 8',
@@ -132,22 +132,22 @@ export default function HopMap({ hops = [] }) {
   }, [hops]);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+    <div className="tl-evidence-surface space-y-4 p-5 sm:p-6" aria-label="Existing IP and geolocation evidence">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+      <div className="flex flex-col justify-between gap-3 border-b border-[var(--tl-border)] pb-3 sm:flex-row sm:items-center">
         <div>
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <Globe2 className="w-4 h-4 text-blue-400" />
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--tl-text)]">
+            <Globe2 className="h-4 w-4 text-[var(--tl-accent)]" />
             Origin Tracer: Received Header Geolocation Trail
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="mt-1 text-xs text-[var(--tl-text-muted)]">
             Chronological reconstruction of MTA hops from origin to mailbox gateway.
           </p>
         </div>
 
         {originHop && (
-          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
-            <ShieldAlert className="w-4 h-4 animate-bounce" />
+          <div className="flex items-center gap-2 rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-1.5 font-mono text-xs text-red-300">
+            <ShieldAlert className="h-4 w-4" />
             <span>
               Origin: <b>{originHop.ip}</b> ({originHop.city}, {originHop.country})
             </span>
@@ -156,21 +156,27 @@ export default function HopMap({ hops = [] }) {
       </div>
 
       {/* Map Container */}
-      <div className="relative w-full h-[400px] rounded-xl overflow-hidden border border-slate-800">
+      <div className="relative h-[420px] w-full overflow-hidden rounded-lg border border-[var(--tl-border)] sm:h-[480px]">
         <div ref={mapContainerRef} className="w-full h-full" />
       </div>
 
+      {hops.length === 0 && (
+        <div className="tl-panel-inset p-4 text-center text-xs text-[var(--tl-text-muted)]">
+          No hop records were returned for this email.
+        </div>
+      )}
+
       {/* Internal Hops Badge Strip */}
       {internalHops.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs">
-          <span className="font-semibold text-slate-400 flex items-center gap-1.5">
-            <Server className="w-3.5 h-3.5 text-slate-500" />
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[var(--tl-border)] bg-[var(--tl-surface-inset)] p-2.5 text-xs">
+          <span className="flex items-center gap-1.5 font-semibold text-[var(--tl-text-muted)]">
+            <Server className="h-3.5 w-3.5 text-[var(--tl-text-muted)]" />
             Internal / Loopback Hops:
           </span>
           {internalHops.map((ih, idx) => (
             <span
               key={idx}
-              className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[11px] border border-slate-700"
+              className="rounded border border-[var(--tl-border-strong)] bg-[var(--tl-surface)] px-2 py-0.5 font-mono text-[11px] text-[var(--tl-text-secondary)]"
             >
               Hop {ih.hop_order + 1}: {ih.ip} ({ih.city})
             </span>
@@ -179,9 +185,10 @@ export default function HopMap({ hops = [] }) {
       )}
 
       {/* Chronological Hop Details Table */}
-      <div className="overflow-x-auto rounded-xl border border-slate-800">
-        <table className="w-full text-left text-xs text-slate-300">
-          <thead className="bg-slate-950 text-slate-400 font-mono text-[11px] uppercase border-b border-slate-800">
+      <div className="overflow-x-auto rounded-lg border border-[var(--tl-border)]">
+        <table className="w-full text-left text-xs text-[var(--tl-text-secondary)]">
+          <caption className="sr-only">Chronological Received header hops</caption>
+          <thead className="border-b border-[var(--tl-border)] bg-[var(--tl-surface-inset)] font-mono text-[11px] uppercase text-[var(--tl-text-muted)]">
             <tr>
               <th className="px-3 py-2.5">Hop #</th>
               <th className="px-3 py-2.5">Role</th>
@@ -191,31 +198,31 @@ export default function HopMap({ hops = [] }) {
               <th className="px-3 py-2.5">Reverse DNS</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 bg-slate-900/50 font-mono">
+          <tbody className="divide-y divide-[var(--tl-border)] bg-[var(--tl-surface)] font-mono">
             {hops.map((h, i) => (
-              <tr key={i} className={h.is_likely_origin ? 'bg-rose-500/5' : ''}>
-                <td className="px-3 py-2 text-slate-400 font-bold">{h.hop_order + 1}</td>
+              <tr key={i} className={h.is_likely_origin ? 'bg-red-400/5' : ''}>
+                <td className="px-3 py-2 font-bold text-[var(--tl-text-muted)]">{h.hop_order + 1}</td>
                 <td className="px-3 py-2">
                   {h.is_likely_origin ? (
-                    <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold">
+                    <span className="rounded border border-red-400/30 bg-red-400/10 px-2 py-0.5 font-bold text-red-300">
                       ORIGIN
                     </span>
                   ) : h.is_internal ? (
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                    <span className="rounded border border-[var(--tl-border-strong)] bg-[var(--tl-surface-inset)] px-2 py-0.5 text-[var(--tl-text-muted)]">
                       INTERNAL
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <span className="rounded border border-emerald-400/25 bg-emerald-400/10 px-2 py-0.5 text-emerald-300">
                       RELAY
                     </span>
                   )}
                 </td>
-                <td className="px-3 py-2 font-bold text-white">{h.ip}</td>
-                <td className="px-3 py-2 text-slate-200">
+                <td className="px-3 py-2 font-bold text-[var(--tl-text)]">{h.ip}</td>
+                <td className="px-3 py-2 text-[var(--tl-text-secondary)]">
                   {h.is_internal ? 'Local Network' : `${h.city}, ${h.country}`}
                 </td>
-                <td className="px-3 py-2 text-slate-400 truncate max-w-[180px]">{h.isp || 'N/A'}</td>
-                <td className="px-3 py-2 text-slate-400 truncate max-w-[180px]">{h.reverse_dns || '—'}</td>
+                <td className="max-w-[180px] truncate px-3 py-2 text-[var(--tl-text-secondary)]">{h.isp || 'N/A'}</td>
+                <td className="max-w-[180px] truncate px-3 py-2 text-[var(--tl-text-secondary)]">{h.reverse_dns || '—'}</td>
               </tr>
             ))}
           </tbody>

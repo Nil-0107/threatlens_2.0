@@ -96,7 +96,10 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://your-project.vercel.app",
+        "http://localhost:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -114,3 +117,12 @@ def root_status():
         "docs_url": "/docs",
         "tagline": "Detect. Trace. Prove."
     }
+
+@app.get("/api/health")
+def health_status():
+    return {
+        "status": "online",
+        "service": "ThreatLens Forensic Intelligence Platform",
+        "version": "2.0.0",
+    }
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Bot, RefreshCw, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Bot, RefreshCw } from 'lucide-react';
 import { getAiBriefing } from '../api/client';
 
 export default function AiBriefingCard({ emailId }) {
@@ -29,46 +29,46 @@ export default function AiBriefingCard({ emailId }) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-indigo-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden">
-      {/* Glow highlight */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -z-0 pointer-events-none" />
+    <div className="tl-evidence-surface relative overflow-hidden p-5 sm:p-6" aria-label="Existing AI analysis briefing">
 
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800 relative z-10">
-        <div className="flex items-center space-x-2.5">
-          <div className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-            <Sparkles className="w-4 h-4" />
+      <div className="relative z-10 flex items-center justify-between gap-3 border-b border-[var(--tl-border)] pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="rounded-md border border-emerald-400/25 bg-emerald-400/10 p-1.5 text-[var(--tl-accent)]">
+            <Sparkles className="h-4 w-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--tl-text)]">
               AI Forensic Executive Briefing
-              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <span className="rounded-full border border-[var(--tl-border-strong)] bg-[var(--tl-surface-inset)] px-2 py-0.5 font-mono text-[10px] font-semibold text-[var(--tl-text-secondary)]">
                 {engine}
               </span>
             </h3>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[var(--tl-text-muted)]">
               Automated social engineering analysis & threat containment advice.
             </p>
           </div>
         </div>
 
         <button
+          type="button"
           onClick={loadBriefing}
           disabled={loading}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-semibold border border-indigo-500/30 transition-colors"
+          aria-label={loading ? 'AI briefing is loading' : 'Refresh existing AI briefing'}
+          className="tl-button-secondary inline-flex items-center gap-1.5 border-emerald-400/25 text-[var(--tl-accent)] hover:border-emerald-400/50"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>{loading ? 'Analyzing...' : 'Refresh AI Analysis'}</span>
         </button>
       </div>
 
-      <div className="mt-3.5 text-xs text-slate-200 leading-relaxed font-sans relative z-10">
+      <div className="relative z-10 mt-3.5 font-sans text-xs leading-relaxed text-[var(--tl-text-secondary)]">
         {loading ? (
-          <div className="flex items-center space-x-2 text-slate-400 font-mono py-2">
-            <Bot className="w-4 h-4 animate-bounce text-indigo-400" />
+          <div className="flex items-center gap-2 py-2 font-mono text-[var(--tl-text-muted)]" role="status" aria-live="polite">
+            <Bot className="h-4 w-4 animate-bounce text-[var(--tl-accent)]" />
             <span>Consulting Google Gemini forensic copilot...</span>
           </div>
         ) : (
-          <p className="bg-slate-950/50 p-3.5 rounded-xl border border-slate-800/80 text-slate-300 leading-relaxed">
+          <p className="tl-panel-inset p-3.5 leading-relaxed text-[var(--tl-text-secondary)]" aria-live="polite">
             {briefing}
           </p>
         )}

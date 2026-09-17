@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export function getAuthToken() {
   return localStorage.getItem('threatlens_token') || null;
@@ -40,7 +40,7 @@ function authHeaders(extra = {}) {
 
 export async function checkBackendHealth() {
   try {
-    const res = await fetch('/');
+    const res = await fetch(`${API_BASE}/health`);
     return res.ok;
   } catch {
     return false;
