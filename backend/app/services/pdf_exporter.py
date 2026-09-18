@@ -2,11 +2,17 @@ import io
 import re
 from datetime import datetime, timezone
 from typing import Optional, List
+from xml.sax.saxutils import escape
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from backend.app.models.email import Email
+
+
+def pdf_text(value: object) -> str:
+    """Escape untrusted values before passing them to ReportLab's XML parser."""
+    return escape("" if value is None else str(value))
 
 def mask_pii_string(text: str) -> str:
     """Masks email addresses, credit cards, and phone numbers in text for non-admin exports."""
@@ -101,12 +107,12 @@ def generate_forensic_pdf(email: Email, mask_pii: bool = False) -> bytes:
     subject_text = mask_pii_string(email.subject or "") if mask_pii else (email.subject or "")
 
     meta_data = [
-        [Paragraph("<b>Incident ID:</b>", body_style), Paragraph(str(email.id), code_style)],
-        [Paragraph("<b>Raw SHA-256 Digest:</b>", body_style), Paragraph(email.raw_hash, code_style)],
-        [Paragraph("<b>Sender:</b>", body_style), Paragraph(sender_text, body_style)],
-        [Paragraph("<b>Subject:</b>", body_style), Paragraph(subject_text, body_style)],
-        [Paragraph("<b>Origin IP:</b>", body_style), Paragraph(email.origin_ip or "N/A", body_style)],
-        [Paragraph("<b>Risk Level:</b>", body_style), Paragraph(f"<b>{email.risk_level.upper()} ({email.risk_score}/100)</b>", body_style)],
+        [Paragraph("<b>Incident ID:</b>", body_style), Paragraph(pdf_text(email.id), code_style)],
+        [Paragraph("<b>Raw SHA-256 Digest:</b>", body_style), Paragraph(pdf_text(email.raw_hash), code_style)],
+        [Paragraph("<b>Sender:</b>", body_style), Paragraph(pdf_text(sender_text), body_style)],
+        [Paragraph("<b>Subject:</b>", body_style), Paragraph(pdf_text(subject_text), body_style)],
+        [Paragraph("<b>Origin IP:</b>", body_style), Paragraph(pdf_text(email.origin_ip or "N/A"), body_style)],
+        [Paragraph("<b>Risk Level:</b>", body_style), Paragraph(f"<b>{pdf_text(email.risk_level.upper())} ({pdf_text(email.risk_score)}/100)</b>", body_style)],
     ]
     meta_table = Table(meta_data, colWidths=[130, 400])
     meta_table.setStyle(TableStyle([
@@ -123,8 +129,8 @@ def generate_forensic_pdf(email: Email, mask_pii: bool = False) -> bytes:
     for r in email.reasons:
         r_text = mask_pii_string(r.reason) if mask_pii else r.reason
         reason_rows.append([
-            Paragraph(r.category, body_style),
-            Paragraph(r_text, body_style),
+            Paragraph(pdf_text(r.category), body_style),
+            Paragraph(pdf_text(r_text), body_style),
             Paragraph(f"+{r.weight}", body_style),
         ])
     if len(reason_rows) == 1:
@@ -149,9 +155,9 @@ def generate_forensic_pdf(email: Email, mask_pii: bool = False) -> bytes:
         hop_loc = f"{h.city}, {h.country}" if not h.is_internal else "Local Network"
         hop_rows.append([
             Paragraph(str(h.hop_order + 1), body_style),
-            Paragraph(h.ip, code_style),
-            Paragraph(hop_loc, body_style),
-            Paragraph(h.isp or "Unknown", body_style),
+            Paragraph(pdf_text(h.ip), code_style),
+            Paragraph(pdf_text(hop_loc), body_style),
+            Paragraph(pdf_text(h.isp or "Unknown"), body_style),
             Paragraph(f"<b>{hop_type}</b>", body_style),
         ])
     if len(hop_rows) == 1:
@@ -172,10 +178,10 @@ def generate_forensic_pdf(email: Email, mask_pii: bool = False) -> bytes:
     audit_rows = [["Action", "Actor", "Timestamp (UTC)", "Entry Hash (SHA-256 Digest)"]]
     for log in email.logs:
         audit_rows.append([
-            Paragraph(log.action, body_style),
-            Paragraph(log.actor, body_style),
+            Paragraph(pdf_text(log.action), body_style),
+            Paragraph(pdf_text(log.actor), body_style),
             Paragraph(log.timestamp.strftime("%Y-%m-%d %H:%M:%S"), body_style),
-            Paragraph(log.entry_hash[:32] + "...", code_style),
+            Paragraph(pdf_text(log.entry_hash[:32] + "..."), code_style),
         ])
     if len(audit_rows) == 1:
         audit_rows.append([Paragraph("INGEST", body_style), Paragraph("analyst", body_style), Paragraph("Recorded", body_style), Paragraph(email.raw_hash[:32] + "...", code_style)])

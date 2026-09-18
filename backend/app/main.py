@@ -95,7 +95,13 @@ app = FastAPI(
 
 # Configure CORS. Local development is always supported; deployed frontends are
 # supplied through CORS_ORIGINS (a comma-separated environment variable).
-cors_origins = ["http://localhost:5173"]
+# Support both names used to reach Vite locally.  They are different browser
+# origins, so allowing only ``localhost`` makes direct local API calls from
+# ``127.0.0.1:5173`` fail as a generic "Failed to fetch" error.
+cors_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 if settings.CORS_ORIGINS:
     cors_origins.extend(
         origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()
