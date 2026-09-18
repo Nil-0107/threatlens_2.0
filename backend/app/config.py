@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
     APP_DEBUG: bool = True
 
+    # Comma-separated browser origins permitted to call the API in production.
+    # Example: https://threatlens.vercel.app
+    CORS_ORIGINS: str = ""
+
     DATABASE_URL: str = "sqlite:///./threatlens.db"
 
     SECRET_KEY: str = "threatlens-secret-key-36hour-hackathon-2026"
